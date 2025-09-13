@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Recommended Companies</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fa;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+      color: #222;
+    }
+
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .card {
+      position: relative;
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+      overflow: visible;
+    }
+
+    .company-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1f3d8f;
+      margin-bottom: 6px;
+    }
+
+    .description {
+      font-size: 13.5px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .meta {
+      font-size: 14px;
+      color: #333;
+      margin: 6px 0;
+    }
+
+    .meta strong {
+      color: #222;
+    }
+
+    .apply-link {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: #28a745;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    }
+
+    .apply-link:hover {
+      background: #1f7a34;
+    }
+
+    .badges {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .keyword-badge {
+      background: #eefaf1;
+      color: #1b7a3a;
+      padding: 6px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .skill-label {
+      background: #eef6ff;
+      color: #0b66d1;
+      padding: 6px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    .score {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 6px 8px;
+      background: #f0f6ff;
+      color: #0b66d1;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .no-link {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      color: gray;
+      font-size: 13px;
+    }
+
+    .btn-back {
+      display: block;
+      margin: 28px auto 0;
+      padding: 10px 18px;
+      background: #0b66d1;
+      color: #fff;
+      border-radius: 8px;
+      text-decoration: none;
+      text-align: center;
+      width: 140px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Recommended Companies</h1>
+    <div id="recList" class="cards"></div>
+     
+  </div>
+
+  <script>
+  function renderRecommendations() {
+    const recListDiv = document.getElementById("recList");
+    const container = recListDiv.parentNode;
+    const recommendations = JSON.parse(localStorage.getItem("recommendations") || "[]");
+
+    console.log("Recommendations (frontend):", recommendations); // debug
+
+    if (!Array.isArray(recommendations) || recommendations.length === 0) {
+      recListDiv.innerHTML = "<p style='text-align:center;'>No matching companies found.</p>";
+      return;
+    }
+
+    // Sort by similarity score (nearest to 1 → descending order)
+    recommendations.sort((a, b) => (b.similarity_score || 0) - (a.similarity_score || 0));
+
+    // Split top 5 and remaining
+    const topFive = recommendations.slice(0, 5);
+    const remaining = recommendations.slice(5);
+
+    // Function to render a single card
+    function renderCard(rec) {
+      const matched = Array.isArray(rec.matched_keywords) ? rec.matched_keywords : [];
+      const skillsText = rec.required_skills || "";
+
+      const skillBadges = skillsText
+        ? skillsText.split(/[;,|]/).map(s => s.trim()).filter(Boolean)
+          .map(s => `<span class="skill-label">${escapeHtml(s)}</span>`).join(' ')
+        : '';
+
+      const matchedBadges = matched.length
+        ? matched.map(k => `<span class="keyword-badge">${escapeHtml(k)}</span>`).join(' ')
+        : '<em style="color:#888;font-size:13px;">No matched keywords</em>';
+
+      const appUrl = rec.application_url || '';
+      const appLabel = rec.application_label || 'Apply';
+
+      const applyHtml = appUrl
+        ? `<a class="apply-link" href="${escapeAttr(appUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(appLabel)}</a>`
+        : `<div class="no-link">No Apply Link</div>`;
+
+      return `
+        <div class="card">
+          ${applyHtml}
+          <div class="company-name">${escapeHtml(rec.company || "")}</div>
+          <div class="description">${escapeHtml(rec.description || "")}</div>
+
+          <div class="meta"><strong>Role:</strong> ${escapeHtml(rec.role || "")}</div>
+          <div class="meta"><strong>Location:</strong> ${escapeHtml(rec.location || "")}</div>
+          <div class="meta"><strong>Date Posted:</strong> ${escapeHtml(rec.date_posted || "Not Available")}</div>
+
+          <div class="meta"><strong>Required Skills:</strong> ${skillBadges}</div>
+
+          <div class="badges">
+            <div><strong>✅ ${Number(rec.keyword_matches || 0)} matched</strong></div>
+            <div class="score">Score: ${Number(rec.similarity_score || 0).toFixed(3)}</div>
+          </div>
+
+          <div style="margin-top:8px;">${matchedBadges}</div>
+        </div>
+      `;
+    }
+
+    // Render top 5 first
+    recListDiv.innerHTML = topFive.map(renderCard).join('');
+
+    // If there are more, add Show More button
+    if (remaining.length > 0) {
+      const showMoreBtn = document.createElement("button");
+      showMoreBtn.textContent = "Show More";
+      showMoreBtn.className = "btn-show-more";
+      showMoreBtn.style.display = "block";
+      showMoreBtn.style.margin = "20px auto 10px";
+      showMoreBtn.style.padding = "10px 18px";
+      showMoreBtn.style.background = "#0b66d1";
+      showMoreBtn.style.color = "#fff";
+      showMoreBtn.style.border = "none";
+      showMoreBtn.style.borderRadius = "8px";
+      showMoreBtn.style.cursor = "pointer";
+
+      showMoreBtn.addEventListener("click", () => {
+        recListDiv.innerHTML += remaining.map(renderCard).join('');
+        showMoreBtn.remove();
+      });
+
+      container.appendChild(showMoreBtn);
+    }
+
+    // Always place Back button last
+    const backBtn = document.createElement("a");
+    backBtn.href = "education.html";
+    backBtn.className = "btn-back";
+    backBtn.textContent = "← Back";
+    container.appendChild(backBtn);
+  }
+
+  // small helper - escape HTML
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function escapeAttr(str) {
+    return escapeHtml(str).replace(/"/g, '&quot;');
+  }
+
+  renderRecommendations();
+</script>
+
+
+</body>
+
+</html>
