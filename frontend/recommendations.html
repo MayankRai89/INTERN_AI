@@ -5,134 +5,168 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Recommended Companies</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f7fa;
-      margin: 0;
-      padding: 20px;
-    }
+  /* Global Styles */
+body {
+  font-family: 'Inter', Arial, sans-serif;
+  background: #f9fafb;
+  margin: 0;
+  padding: 20px;
+  color: #1f2937;
+}
 
-    .container {
-      max-width: 980px;
-      margin: 0 auto;
-    }
+/* Container */
+.container {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 10px;
+}
 
-    h1 {
-      text-align: center;
-      margin-bottom: 24px;
-      color: #222;
-    }
+/* Heading */
+h1 {
+  text-align: center;
+  margin-bottom: 32px;
+  color: #111827;
+  font-weight: 700;
+  font-size: 2rem;
+}
 
-    .cards {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
+/* Cards Layout */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
 
-    .card {
-      position: relative;
-      background: #fff;
-      border-radius: 12px;
-      padding: 18px 20px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
-      overflow: visible;
-    }
+/* Individual Card */
+.card {
+  position: relative;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 
-    .company-name {
-      font-size: 18px;
-      font-weight: 700;
-      color: #1f3d8f;
-      margin-bottom: 6px;
-    }
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
 
-    .description {
-      font-size: 13.5px;
-      color: #555;
-      margin-bottom: 10px;
-    }
+/* Company Name */
+.company-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
 
-    .meta {
-      font-size: 14px;
-      color: #333;
-      margin: 6px 0;
-    }
+/* Description */
+.description {
+  font-size: 14px;
+  color: #4b5563;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
 
-    .meta strong {
-      color: #222;
-    }
+/* Meta Info */
+.meta {
+  font-size: 14px;
+  color: #374151;
+  margin: 6px 0;
+}
 
-    .apply-link {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      background: #28a745;
-      color: #fff;
-      padding: 8px 12px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-    }
+.meta strong {
+  color: #111827;
+}
 
-    .apply-link:hover {
-      background: #1f7a34;
-    }
+/* Apply Link / Button */
+.apply-link {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
 
-    .badges {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-    }
+.apply-link:hover {
+  background: #1e40af;
+  transform: translateY(-2px);
+}
 
-    .keyword-badge {
-      background: #eefaf1;
-      color: #1b7a3a;
-      padding: 6px 8px;
-      border-radius: 999px;
-      font-size: 12px;
-    }
+/* No link placeholder */
+.no-link {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  font-style: italic;
+}
 
-    .skill-label {
-      background: #eef6ff;
-      color: #0b66d1;
-      padding: 6px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-    }
+/* Badges */
+.badges {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
 
-    .score {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 6px 8px;
-      background: #f0f6ff;
-      color: #0b66d1;
-      border-radius: 6px;
-      font-weight: 600;
-    }
+.keyword-badge {
+  background: #ecfdf5;
+  color: #065f46;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
 
-    .no-link {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      color: gray;
-      font-size: 13px;
-    }
+.skill-label {
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
 
-    .btn-back {
-      display: block;
-      margin: 28px auto 0;
-      padding: 10px 18px;
-      background: #0b66d1;
-      color: #fff;
-      border-radius: 8px;
-      text-decoration: none;
-      text-align: center;
-      width: 140px;
-    }
-  </style>
+.score {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 6px 10px;
+  background: #f0f9ff;
+  color: #1e40af;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* Back Button */
+.btn-back {
+  display: block;
+  margin: 32px auto 0;
+  padding: 12px 20px;
+  background: #2563eb;
+  color: #ffffff;
+  border-radius: 8px;
+  text-decoration: none;
+  text-align: center;
+  width: 160px;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-back:hover {
+  background: #1e40af;
+  transform: translateY(-2px);
+}
+
 </head>
 
 <body>
